@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"microserce/data"
 	"net/http"
@@ -72,6 +73,13 @@ func (p Products) MilddlewareProductValidator(next http.Handler) http.Handler {
 		err := prod.FromJSON(r.Body)
 		if err != nil {
 			http.Error(w, "Could not unmarshall json", http.StatusBadRequest)
+			return
+		}
+
+		// validate the product
+		err = prod.Validator()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Could not validate product: %s", err), http.StatusBadRequest)
 			return
 		}
 
